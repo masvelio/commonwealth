@@ -1,0 +1,9 @@
+/api/node_modules
+/api/dist
+/api/.env
+
+/client/node_modules
+/client/dist
+/client/.env
+
+.idea
