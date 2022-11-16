@@ -60,7 +60,7 @@ const NFTDetailsModal = ({
         </Dialog.Title>
       )}
 
-      <div className="grid grid-flow-col auto-cols-auto">
+      <div className="grid sm:grid-flow-col grid-flow-row auto-cols-auto">
         <div className="h-52 aspect-square overflow-hidden rounded-lg bg-gray-200">
           {imageUrl ? (
             <img src={imageUrl} alt={nft?.name || ""} className="rounded-xl" />
@@ -70,7 +70,7 @@ const NFTDetailsModal = ({
             </div>
           )}
         </div>
-        <div className="flex flex-col ml-8">
+        <div className="flex flex-col sm:ml-8 sm:mt-0 mt-4">
           {infos.map((el) => (
             <Info label={el.label} info={el.info} key={el.label} />
           ))}
