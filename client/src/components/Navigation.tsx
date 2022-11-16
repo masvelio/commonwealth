@@ -4,10 +4,11 @@ import clsx from "clsx";
 import { Link, useLocation } from "react-router-dom";
 
 import logo from "../../assets/logo.png";
+import { routes } from "../utils/routes";
 
 const navigation = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
+  { name: "Home", path: routes.HOME },
+  { name: "NFT Balance", path: routes.NFT_BALANCE },
 ];
 
 interface MobileMenuButton {
