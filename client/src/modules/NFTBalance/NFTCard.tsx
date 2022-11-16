@@ -35,7 +35,7 @@ const NFTCard = ({
         )}
       </div>
       <div className="p-6">
-        <h3 className="text-lg font-semibold text-indigo-600">{name}</h3>
+        <h3 className="text-lg font-semibold text-indigo-600 truncate">{name}</h3>
         <h3 className="text-sm font-semibold text-gray-600">{contractName}</h3>
       </div>
     </div>

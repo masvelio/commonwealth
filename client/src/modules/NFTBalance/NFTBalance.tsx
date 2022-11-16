@@ -1,27 +1,26 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Dialog, Transition } from "@headlessui/react";
-import { TokensQuery } from "@zoralabs/zdk";
 import { useQuery } from "@tanstack/react-query";
 
 import NFTListContent from "./NFTListContent";
+import { env } from "../../utils/config";
+import { APIToken, APITokens } from "../../utils/types";
+import NFTDetailsModal from "./NFTDetailsModal";
 
 const fetchNFTByAddress = async (address: string) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/nft/${address}`
-  );
+  const response = await fetch(`${env.VITE_API_URL}/api/nft/${address}`);
   return await response.json();
 };
 
 const NFTBalance = () => {
   const [animationParent] = useAutoAnimate<HTMLDivElement>();
-
-  const [address, setAddress] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeToken, setActiveToken] = useState<APIToken | null>(null);
+  const [address, setAddress] = useState("");
 
-  const { data, refetch, isFetching } = useQuery<
-    TokensQuery["tokens"] & { error: string }
+  const { data, refetch, isFetching, isFetched } = useQuery<
+    APITokens & { error: string }
   >({
     queryKey: ["nft-balance", address],
     queryFn: () => fetchNFTByAddress(address),
@@ -37,74 +36,23 @@ const NFTBalance = () => {
     refetch();
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (token: APIToken) => {
     setIsModalOpen(true);
+    setActiveToken(token);
   };
 
   const showTypeForResults = !data;
   const nfts = data?.nodes;
   const validationError = !!data?.error;
+  const noResults = isFetched && data?.nodes?.length === 0;
 
   return (
     <>
-      <Transition appear show={isModalOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          onClose={() => setIsModalOpen(false)}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Payment successful
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Your payment has been successfully submitted. We’ve sent
-                      you an email with all of the details of your order.
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Got it, thanks!
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <NFTDetailsModal
+        nft={activeToken}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
 
       <div className="flex min-h-full items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-lg space-y-8">
@@ -149,6 +97,7 @@ const NFTBalance = () => {
           handleCardClick={handleCardClick}
           isFetching={isFetching}
           validationError={validationError}
+          noResults={noResults}
         />
       </div>
     </>
